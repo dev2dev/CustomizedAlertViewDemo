@@ -66,22 +66,42 @@ static CGFloat kTransitionDuration = 0.3f;
 	[UIView commitAnimations];
 }
 
+- (void)alertViewIsRemoved{
+	[[mAlertViewSuperView retain] removeFromSuperview];
+	[mTempFullscreenWindow release];
+	mTempFullscreenWindow = nil;
+}
+
 #pragma mark IBAction
 
 - (IBAction)showAlertView:(id)sender{
-	[mAlertWindow setWindowLevel:UIWindowLevelAlert];
-	[mAlertWindow makeKeyAndVisible];
-	mAlertView.transform = CGAffineTransformScale([self transformForOrientation], 0.001, 0.001);
-	[UIView beginAnimations:nil context:nil];
-	[UIView setAnimationDuration:kTransitionDuration/1.5];
-	[UIView setAnimationDelegate:self];
-	[UIView setAnimationDidStopSelector:@selector(bounce1AnimationStopped)];
-	mAlertView.transform = CGAffineTransformScale([self transformForOrientation], 1.1, 1.1);
-	[UIView commitAnimations];
+	if (!mTempFullscreenWindow) {
+		mTempFullscreenWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		mTempFullscreenWindow.windowLevel = UIWindowLevelStatusBar;
+		mTempFullscreenWindow.backgroundColor = [UIColor clearColor];
+		[mTempFullscreenWindow addSubview:mAlertViewSuperView];
+		[mAlertViewSuperView setAlpha:0.0f];
+		[mAlertViewSuperView setFrame:[mTempFullscreenWindow bounds]];
+		[mTempFullscreenWindow makeKeyAndVisible];
+		
+		mAlertView.transform = CGAffineTransformScale([self transformForOrientation], 0.001, 0.001);
+		[UIView beginAnimations:nil context:nil];
+		[UIView setAnimationDuration:kTransitionDuration/1.5];
+		[UIView setAnimationDelegate:self];
+		[UIView setAnimationDidStopSelector:@selector(bounce1AnimationStopped)];
+		mAlertView.transform = CGAffineTransformScale([self transformForOrientation], 1.1, 1.1);
+		[mAlertViewSuperView setAlpha:1.0f];
+		[UIView commitAnimations];
+	}
 }
 
 - (IBAction)dismissAlertView:(id)sender{
-	[mAlertWindow resignKeyWindow];
+	[UIView beginAnimations:nil context:nil];
+	[UIView setAnimationDuration:kTransitionDuration/2];
+	[UIView setAnimationDelegate:self];
+	[UIView setAnimationDidStopSelector:@selector(alertViewIsRemoved)];
+	[mAlertViewSuperView setAlpha:0.0f];
+	[UIView commitAnimations];
 }
 
 

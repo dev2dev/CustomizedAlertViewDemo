@@ -12,10 +12,11 @@
 @interface CustomizedAlertViewDemoAppDelegate : NSObject <UIApplicationDelegate, UIActionSheetDelegate> {
     UIWindow *window;
 	
+	IBOutlet UIView *mAlertViewSuperView;
 	IBOutlet UIView *mAlertView;
-	IBOutlet UIWindow *mAlertWindow;
-	
 	IBOutlet UIButton *mShowAlertButton;
+	
+	UIWindow *mTempFullscreenWindow;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
